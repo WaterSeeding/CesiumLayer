@@ -41,22 +41,15 @@ const setRayCollision = (
     pickRay,
     viewer.scene
   ) as Promise<Cesium.ImageryLayerFeatureInfo[]>;
-  console.log("featuresPromise", featuresPromise);
   if (!Cesium.defined(featuresPromise)) {
   } else {
-    Promise.resolve(featuresPromise).then((features) => {
+    Promise.resolve(featuresPromise).then((features: any) => {
       if (features.length > 0) {
-        let { layerId, attributes, geometry, value } = features[0].data;
-        if (layerId === 1 && attributes && geometry) {
-          transferImageryLayerFeatures(attributes);
-        }
+        let properties = features[0].properties;
+        console.log("properties", properties);
       }
     });
   }
-};
-
-const transferImageryLayerFeatures = (attributes: any) => {
-  console.warn("[发送信息...........]", attributes);
 };
 
 const gui = new dat.GUI({
@@ -68,18 +61,34 @@ const gui = new dat.GUI({
 gui.domElement.id = "gui";
 gui.show();
 
-const scene = viewer.scene;
+viewer.imageryLayers.addImageryProvider(
+  new Cesium.ArcGisMapServerImageryProvider({
+    url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
+  })
+);
 
 const provider_香蜜湖 = new Cesium.WebMapServiceImageryProvider({
   url: "http://127.0.0.1:8080/geoserver/wms",
-  layers: "JYuan_xiangmihu_map:香蜜湖",
+  layers: "	ShenZhen_xiangmihu:深圳福田0618",
+  parameters: {
+    name: "	ShenZhen_xiangmihu:深圳福田0618",
+    service: "WMS",
+    format: "image/png",
+    transparent: true,
+  },
 });
 const imageryLayer_香蜜湖 = new Cesium.ImageryLayer(provider_香蜜湖);
 viewer.imageryLayers.add(imageryLayer_香蜜湖);
 
 const provider_测试图层 = new Cesium.WebMapServiceImageryProvider({
   url: "http://127.0.0.1:8080/geoserver/wms",
-  layers: "gutouproject_map:0710gutouproject测试图层",
+  layers: "Fubaojiedao:福保街道图层数据",
+  parameters: {
+    name: "Fubaojiedao:福保街道图层数据",
+    service: "WMS",
+    format: "image/png",
+    transparent: true,
+  },
 });
 const imageryLayer_测试图层 = new Cesium.ImageryLayer(provider_测试图层);
 viewer.imageryLayers.add(imageryLayer_测试图层);
